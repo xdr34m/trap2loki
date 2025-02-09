@@ -11,13 +11,13 @@
 
 ## PreConfigured
 ### Telegraf
-- able to receive and translate snmpv1traps
-- able to output translated trap to loki api (here alloy source api component)
+- receive and translate snmpv1traps
+- output translated trap to loki api (here alloy source api component)
 
 ### Alloy
-- able to receive loki reqs
-- able to relabel and process the logentry
-- able to write it to actual loki
+- receive loki reqs
+- relabel and process the logentry
+- write to actual loki
 
 ### loki
 - basic local install (no persistence)
