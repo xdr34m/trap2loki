@@ -1,0 +1,54 @@
+logging {
+  level  = "info"
+  format = "json"
+}
+loki.relabel "defaulttrap"{
+  forward_to=[]
+
+  rule{
+    action="replace"
+    source_labels=["agent_address"]
+    target_label="instance"
+  }
+  rule{
+    action="replace"
+    source_labels=["source"]
+    target_label="sourceip"
+  }
+    rule{
+    action="labeldrop"
+    regex="community|version|host|metricname|source|agent_address"
+  }
+}
+loki.source.api "local" {
+  http {
+      listen_address = "0.0.0.0"
+      listen_port = 3100
+  }
+  relabel_rules = loki.relabel.defaulttrap.rules
+  forward_to = [loki.process.telegraflog.receiver]
+  labels={"app"="ItsATrap"}
+}
+loki.process "telegraflog"{
+  forward_to=[loki.relabel.default.receiver]
+  stage.pack{
+    labels = ["name","oid","mib"]
+  }
+}
+loki.relabel "default"{
+  rule{
+    action="keep"
+    regex=".*"
+  }
+
+
+  forward_to=[loki.echo.local.receiver,loki.write.local.receiver]
+}
+
+loki.echo "local"{}
+
+loki.write "local"{
+  endpoint{
+    url="http://loki:3100/loki/api/v1/push"
+  }
+}
